@@ -11,6 +11,7 @@ import axios from "axios";
 import { FLIGHT_INFO_API_URL } from "@/configs/FlightInfo";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import { FlightInfoSuccessDialog } from "@/components/FlightInfo/FlightInfoSuccessDialog";
 
 interface FlightOrderForm {
   flightNumber: string,
@@ -74,7 +75,7 @@ export default function Home() {
     },
     resolver: yupResolver(schema),
   })
-
+  const [isOpenFlightInfoSuccessDialog, setIsOpenFlightInfoSuccessDialog] = useState(false)
   const onSubmit: SubmitHandler<FlightOrderForm> = async (data) => {
     const { flightNumber } = data
 
@@ -86,7 +87,7 @@ export default function Home() {
     }
 
     if (flightInfoMapDraft.has(flightNumber)) {
-      alert('完成送機行程')
+      setIsOpenFlightInfoSuccessDialog(true)
     } else {
       alert('查不到xxx航班資訊')
     }
@@ -152,6 +153,8 @@ export default function Home() {
       <Box my={2.5}>
         <Button type='submit' variant="contained" fullWidth>下一步</Button>
       </Box>
+
+      <FlightInfoSuccessDialog open={isOpenFlightInfoSuccessDialog} onClose={() => setIsOpenFlightInfoSuccessDialog(false)} />
 
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
