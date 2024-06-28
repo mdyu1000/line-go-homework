@@ -30,7 +30,8 @@ const schema = yup.object({
   passengerName: yup
     .string()
     .matches(/^[A-Za-z\s]+$/, '姓名僅能接受英文字母大小寫與空格')
-    .required('姓名為必填'),
+    .required('姓名為必填')
+    .test('non-empty', '姓名為必填', (value) => !!value && value.trim().length > 0),
   passengerPhone: yup
     .string()
     .matches(/^\d+$/, '電話僅能接受數字')
