@@ -3,17 +3,39 @@ import { Box, Stack, Typography } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useForm, Controller, SubmitHandler } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
 
-interface FlightOrder {
+interface FlightOrderForm {
   flightNumber: string,
   passengerName: string,
   passengerPhone: string,
   passengerId: string,
-  passengerRemarks: string,
+  passengerRemarks?: string,
 }
 
+const schema = yup.object({
+  flightNumber: yup
+    .string()
+    .matches(/^[A-Za-z0-9]+$/, '航班編號僅能接受英文字母大小寫與數字')
+    .required('航班編號為必填'),
+  passengerName: yup
+    .string()
+    .matches(/^[A-Za-z\s]+$/, '姓名僅能接受英文字母大小寫與空格')
+    .required('姓名為必填'),
+  passengerPhone: yup
+    .string()
+    .matches(/^\d+$/, '電話僅能接受數字')
+    .required('電話為必填'),
+  passengerId: yup
+    .string()
+    .matches(/^[A-Za-z0-9]+$/, '身分證字號/護照編號僅能接受英文字母與數字')
+    .required('身分證字號/護照編號為必填'),
+  passengerRemarks: yup.string(),
+});
+
 export default function Home() {
-  const { control, handleSubmit } = useForm<FlightOrder>({
+  const { control, handleSubmit, formState: { errors } } = useForm<FlightOrderForm>({
     defaultValues: {
       flightNumber: "",
       passengerName: "",
@@ -21,9 +43,10 @@ export default function Home() {
       passengerId: "",
       passengerRemarks: "",
     },
+    resolver: yupResolver(schema),
   })
 
-  const onSubmit: SubmitHandler<FlightOrder> = (data) => {
+  const onSubmit: SubmitHandler<FlightOrderForm> = (data) => {
     console.log(data)
   }
 
@@ -31,7 +54,6 @@ export default function Home() {
     <Box
       minWidth={375}
       maxWidth={768}
-      height='100vh'
       mx="auto"
       px={2.5}
       component='form'
@@ -47,7 +69,9 @@ export default function Home() {
           <Controller
             name="flightNumber"
             control={control}
-            render={({ field }) => <TextField {...field} label="航班編號" />}
+            render={({ field, fieldState: { error } }) => (
+              <TextField {...field} label="航班編號" error={!!error} helperText={error?.message} />
+            )}
           />
         </Stack>
       </Box>
@@ -57,17 +81,23 @@ export default function Home() {
           <Controller
             name="passengerName"
             control={control}
-            render={({ field }) => <TextField {...field} label="姓名" />}
+            render={({ field, fieldState: { error } }) => (
+              <TextField {...field} label="姓名" error={!!error} helperText={error?.message} />
+            )}
           />
           <Controller
             name="passengerPhone"
             control={control}
-            render={({ field }) => <TextField {...field} label="電話" />}
+            render={({ field, fieldState: { error } }) => (
+              <TextField {...field} label="電話" error={!!error} helperText={error?.message} />
+            )}
           />
           <Controller
             name="passengerId"
             control={control}
-            render={({ field }) => <TextField {...field} label="身分證字號/護照編號" />}
+            render={({ field, fieldState: { error } }) => (
+              <TextField {...field} label="身分證字號/護照編號" error={!!error} helperText={error?.message} />
+            )}
           />
           <Controller
             name="passengerRemarks"
@@ -76,8 +106,8 @@ export default function Home() {
           />
         </Stack>
       </Box>
-      <Box mt={2.5}>
-        <Button variant="contained" fullWidth>下一步</Button>
+      <Box my={2.5}>
+        <Button type='submit' variant="contained" fullWidth>下一步</Button>
       </Box>
     </Box>
   );
