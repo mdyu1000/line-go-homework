@@ -1,0 +1,1 @@
+export const FLIGHT_INFO_API_URL = 'https://tdx.transportdata.tw/api/basic/v2/Air/FIDS/Airport/Departure/TPE?$orderby=ScheduleDepartureTime&$format=JSON'

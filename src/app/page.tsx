@@ -5,6 +5,12 @@ import Button from '@mui/material/Button';
 import { useForm, Controller, SubmitHandler } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
+import { useCallback, useEffect, useState } from "react";
+import { FlightInfo, FlightInfoMap } from "@/types/FlightInfo";
+import axios from "axios";
+import { FLIGHT_INFO_API_URL } from "@/configs/FlightInfo";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface FlightOrderForm {
   flightNumber: string,
@@ -35,6 +41,29 @@ const schema = yup.object({
 });
 
 export default function Home() {
+  const [flightInfoMap, setFlightInfoMap] = useState<FlightInfoMap>(new Map())
+  const fetchFlightInfo = async () => {
+    const { data } = await axios.get<FlightInfo[]>(FLIGHT_INFO_API_URL)
+    const newFlightInfoMap = data.reduce<FlightInfoMap>((acc, curr) => {
+      const key = curr.AirlineID + curr.FlightNumber
+      return acc.set(key, curr)
+    }, new Map())
+    return newFlightInfoMap
+  }
+  const initFlightInfoMap = useCallback(async () => {
+    try {
+      const newFlightInfoMap = await fetchFlightInfo()
+      setFlightInfoMap(newFlightInfoMap)
+    } catch (error) {
+      console.error('initFlightInfoMap error')
+    }
+  }, [])
+  useEffect(() => {
+    initFlightInfoMap()
+  }, [initFlightInfoMap])
+
+
+  const [isWaiting, setIsWaiting] = useState(false)
   const { control, handleSubmit, formState: { errors } } = useForm<FlightOrderForm>({
     defaultValues: {
       flightNumber: "",
@@ -46,9 +75,23 @@ export default function Home() {
     resolver: yupResolver(schema),
   })
 
-  const onSubmit: SubmitHandler<FlightOrderForm> = (data) => {
-    console.log(data)
+  const onSubmit: SubmitHandler<FlightOrderForm> = async (data) => {
+    const { flightNumber } = data
+
+    let flightInfoMapDraft = flightInfoMap
+    if (flightInfoMapDraft.size === 0) {
+      setIsWaiting(true)
+      flightInfoMapDraft = await fetchFlightInfo()
+      setFlightInfoMap(flightInfoMapDraft)
+    }
+
+    if (flightInfoMapDraft.has(flightNumber)) {
+      alert('完成送機行程')
+    } else {
+      alert('查不到xxx航班資訊')
+    }
   }
+
 
   return (
     <Box
@@ -109,6 +152,13 @@ export default function Home() {
       <Box my={2.5}>
         <Button type='submit' variant="contained" fullWidth>下一步</Button>
       </Box>
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isWaiting}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 }
