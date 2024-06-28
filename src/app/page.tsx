@@ -12,6 +12,7 @@ import { FLIGHT_INFO_API_URL } from "@/configs/FlightInfo";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { FlightInfoSuccessDialog } from "@/components/FlightInfo/FlightInfoSuccessDialog";
+import { FlightInfoRemindDialog } from "@/components/FlightInfo/FlightInfoRemindDialog";
 
 interface FlightOrderForm {
   flightNumber: string,
@@ -65,7 +66,7 @@ export default function Home() {
 
 
   const [isWaiting, setIsWaiting] = useState(false)
-  const { control, handleSubmit, formState: { errors } } = useForm<FlightOrderForm>({
+  const { control, handleSubmit, watch, reset } = useForm<FlightOrderForm>({
     defaultValues: {
       flightNumber: "",
       passengerName: "",
@@ -76,6 +77,7 @@ export default function Home() {
     resolver: yupResolver(schema),
   })
   const [isOpenFlightInfoSuccessDialog, setIsOpenFlightInfoSuccessDialog] = useState(false)
+  const [isOpenFlightInfoRemindDialog, setIsOpenFlightInfoRemindDialog] = useState(false)
   const onSubmit: SubmitHandler<FlightOrderForm> = async (data) => {
     const { flightNumber } = data
 
@@ -89,10 +91,11 @@ export default function Home() {
     if (flightInfoMapDraft.has(flightNumber)) {
       setIsOpenFlightInfoSuccessDialog(true)
     } else {
-      alert('查不到xxx航班資訊')
+      setIsOpenFlightInfoRemindDialog(true)
     }
   }
 
+  const watchFlightNumber = watch('flightNumber')
 
   return (
     <Box
@@ -154,7 +157,21 @@ export default function Home() {
         <Button type='submit' variant="contained" fullWidth>下一步</Button>
       </Box>
 
-      <FlightInfoSuccessDialog open={isOpenFlightInfoSuccessDialog} onClose={() => setIsOpenFlightInfoSuccessDialog(false)} />
+      <FlightInfoSuccessDialog
+        open={isOpenFlightInfoSuccessDialog}
+        onClose={() => setIsOpenFlightInfoSuccessDialog(false)}
+        TransitionProps={{ onExit: () => reset() }}
+      />
+      <FlightInfoRemindDialog
+        flightNumber={watchFlightNumber}
+        open={isOpenFlightInfoRemindDialog}
+        onClose={() => setIsOpenFlightInfoRemindDialog(false)}
+        onSubmit={() => {
+          setIsOpenFlightInfoRemindDialog(false)
+          setIsOpenFlightInfoSuccessDialog(true)
+        }}
+        onCancel={() => setIsOpenFlightInfoRemindDialog(false)}
+      />
 
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
