@@ -1,95 +1,84 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+import { Box, Stack, Typography } from "@mui/material";
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import { useForm, Controller, SubmitHandler } from "react-hook-form"
+
+interface FlightOrder {
+  flightNumber: string,
+  passengerName: string,
+  passengerPhone: string,
+  passengerId: string,
+  passengerRemarks: string,
+}
 
 export default function Home() {
+  const { control, handleSubmit } = useForm<FlightOrder>({
+    defaultValues: {
+      flightNumber: "",
+      passengerName: "",
+      passengerPhone: "",
+      passengerId: "",
+      passengerRemarks: "",
+    },
+  })
+
+  const onSubmit: SubmitHandler<FlightOrder> = (data) => {
+    console.log(data)
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <Box
+      minWidth={375}
+      maxWidth={768}
+      height='100vh'
+      mx="auto"
+      px={2.5}
+      component='form'
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Typography mt={2} fontWeight='bold' textAlign='center' fontSize="1.3rem">
+        送機行程
+      </Typography>
+      <Box mt={2}>
+        <Typography>送機計畫</Typography>
+        <Stack mt={2} spacing={2.5}>
+          <TextField label="下車機場" defaultValue="桃園國際機場 第一航廈" disabled />
+          <Controller
+            name="flightNumber"
+            control={control}
+            render={({ field }) => <TextField {...field} label="航班編號" />}
+          />
+        </Stack>
+      </Box>
+      <Box mt={2}>
+        <Typography>旅客資訊</Typography>
+        <Stack mt={2} spacing={2.5}>
+          <Controller
+            name="passengerName"
+            control={control}
+            render={({ field }) => <TextField {...field} label="姓名" />}
+          />
+          <Controller
+            name="passengerPhone"
+            control={control}
+            render={({ field }) => <TextField {...field} label="電話" />}
+          />
+          <Controller
+            name="passengerId"
+            control={control}
+            render={({ field }) => <TextField {...field} label="身分證字號/護照編號" />}
+          />
+          <Controller
+            name="passengerRemarks"
+            control={control}
+            render={({ field }) => <TextField {...field} label="乘車備註" multiline rows={4} />}
+          />
+        </Stack>
+      </Box>
+      <Box mt={2.5}>
+        <Button variant="contained" fullWidth>下一步</Button>
+      </Box>
+    </Box>
   );
 }
