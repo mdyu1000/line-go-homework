@@ -58,7 +58,7 @@ export default function Home() {
       const newFlightInfoMap = await fetchFlightInfo()
       setFlightInfoMap(newFlightInfoMap)
     } catch (error) {
-      console.error('initFlightInfoMap error')
+      console.error('initFlightInfoMap error', error)
     }
   }, [])
   useEffect(() => {
@@ -84,9 +84,15 @@ export default function Home() {
 
     let flightInfoMapDraft = flightInfoMap
     if (flightInfoMapDraft.size === 0) {
-      setIsWaiting(true)
-      flightInfoMapDraft = await fetchFlightInfo()
-      setFlightInfoMap(flightInfoMapDraft)
+      try {
+        setIsWaiting(true)
+        flightInfoMapDraft = await fetchFlightInfo()
+        setFlightInfoMap(flightInfoMapDraft)
+      } catch (error) {
+        console.error('fetchFlightInfo error', error)
+      } finally {
+        setIsWaiting(false)
+      }
     }
 
     if (flightInfoMapDraft.has(flightNumber)) {
