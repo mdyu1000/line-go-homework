@@ -137,7 +137,13 @@ export default function Home() {
             name="passengerPhone"
             control={control}
             render={({ field, fieldState: { error } }) => (
-              <TextField {...field} label="電話" error={!!error} helperText={error?.message} />
+              <TextField
+                {...field}
+                label="電話"
+                error={!!error}
+                helperText={error?.message}
+                inputProps={{ inputMode: 'numeric' }}
+              />
             )}
           />
           <Controller
