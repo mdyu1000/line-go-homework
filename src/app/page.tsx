@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import { useForm, Controller, SubmitHandler } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import { useEffect, useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { FlightInfoSuccessDialog } from "@/components/FlightInfo/FlightInfoSuccessDialog";
@@ -93,6 +93,10 @@ export default function Home() {
     }
   }
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
+    if (event.key === 'Enter') event.preventDefault();
+  };
+
   const watchFlightNumber = watch('flightNumber')
 
   return (
@@ -103,6 +107,7 @@ export default function Home() {
       px={2.5}
       component='form'
       onSubmit={handleSubmit(onSubmit)}
+      onKeyDown={(e) => handleKeyDown(e)}
     >
       <Typography mt={2} fontWeight='bold' textAlign='center' fontSize="1.3rem">
         送機行程
