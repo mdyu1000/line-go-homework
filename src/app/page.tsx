@@ -1,20 +1,18 @@
 'use client'
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useForm, Controller, SubmitHandler } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import { useCallback, useEffect, useState } from "react";
-import { FlightInfo, FlightInfoMap } from "@/types/FlightInfo";
-import axios from "axios";
-import { FLIGHT_INFO_API_URL } from "@/configs/FlightInfo";
+import { useEffect, useState } from "react";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { FlightInfoSuccessDialog } from "@/components/FlightInfo/FlightInfoSuccessDialog";
 import { FlightInfoRemindDialog } from "@/components/FlightInfo/FlightInfoRemindDialog";
 import { useDialog } from "@/hooks/useDialog";
 import { FormSection } from "@/components/FlightInfo/FormSection";
+import { useFlightInfo } from "@/hooks/useFlightInfo";
 
 interface FlightOrderForm {
   flightNumber: string,
@@ -46,27 +44,10 @@ const schema = yup.object({
 });
 
 export default function Home() {
-  const [flightInfoMap, setFlightInfoMap] = useState<FlightInfoMap>(new Map())
-  const fetchFlightInfo = async () => {
-    const { data } = await axios.get<FlightInfo[]>(FLIGHT_INFO_API_URL)
-    const newFlightInfoMap = data.reduce<FlightInfoMap>((acc, curr) => {
-      const key = curr.AirlineID + curr.FlightNumber
-      return acc.set(key, curr)
-    }, new Map())
-    return newFlightInfoMap
-  }
-  const initFlightInfoMap = useCallback(async () => {
-    try {
-      const newFlightInfoMap = await fetchFlightInfo()
-      setFlightInfoMap(newFlightInfoMap)
-    } catch (error) {
-      console.error('initFlightInfoMap error', error)
-    }
-  }, [])
+  const { flightInfoMap, setFlightInfoMap, fetchFlightInfo, initFlightInfoMap } = useFlightInfo()
   useEffect(() => {
     initFlightInfoMap()
   }, [initFlightInfoMap])
-
 
   const [isWaiting, setIsWaiting] = useState(false)
   const { control, handleSubmit, watch, reset } = useForm<FlightOrderForm>({
