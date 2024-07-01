@@ -13,6 +13,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { FlightInfoSuccessDialog } from "@/components/FlightInfo/FlightInfoSuccessDialog";
 import { FlightInfoRemindDialog } from "@/components/FlightInfo/FlightInfoRemindDialog";
+import { useDialog } from "@/hooks/useDialog";
 
 interface FlightOrderForm {
   flightNumber: string,
@@ -77,8 +78,16 @@ export default function Home() {
     },
     resolver: yupResolver(schema),
   })
-  const [isOpenFlightInfoSuccessDialog, setIsOpenFlightInfoSuccessDialog] = useState(false)
-  const [isOpenFlightInfoRemindDialog, setIsOpenFlightInfoRemindDialog] = useState(false)
+  const {
+    isOpen: isOpenFlightInfoSuccessDialog,
+    openDialog: openFlightInfoSuccessDialog,
+    closeDialog: closeFlightInfoSuccessDialog,
+  } = useDialog()
+  const {
+    isOpen: isOpenFlightInfoRemindDialog,
+    openDialog: openFlightInfoRemindDialog,
+    closeDialog: closeFlightInfoRemindDialog,
+  } = useDialog()
   const onSubmit: SubmitHandler<FlightOrderForm> = async (data) => {
     const { flightNumber } = data
 
@@ -96,9 +105,9 @@ export default function Home() {
     }
 
     if (flightInfoMapDraft.has(flightNumber)) {
-      setIsOpenFlightInfoSuccessDialog(true)
+      openFlightInfoSuccessDialog()
     } else {
-      setIsOpenFlightInfoRemindDialog(true)
+      openFlightInfoRemindDialog()
     }
   }
 
@@ -172,18 +181,18 @@ export default function Home() {
 
       <FlightInfoSuccessDialog
         open={isOpenFlightInfoSuccessDialog}
-        onClose={() => setIsOpenFlightInfoSuccessDialog(false)}
+        onClose={() => closeFlightInfoSuccessDialog()}
         TransitionProps={{ onExit: () => reset() }}
       />
       <FlightInfoRemindDialog
         flightNumber={watchFlightNumber}
         open={isOpenFlightInfoRemindDialog}
-        onClose={() => setIsOpenFlightInfoRemindDialog(false)}
+        onClose={() => closeFlightInfoRemindDialog}
         onSubmit={() => {
-          setIsOpenFlightInfoRemindDialog(false)
-          setIsOpenFlightInfoSuccessDialog(true)
+          closeFlightInfoRemindDialog()
+          openFlightInfoSuccessDialog()
         }}
-        onCancel={() => setIsOpenFlightInfoRemindDialog(false)}
+        onCancel={() => closeFlightInfoRemindDialog}
       />
 
       <Backdrop
