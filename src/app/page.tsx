@@ -182,12 +182,12 @@ export default function Home() {
       <FlightInfoRemindDialog
         flightNumber={watchFlightNumber}
         open={isOpenFlightInfoRemindDialog}
-        onClose={() => closeFlightInfoRemindDialog}
+        onClose={() => closeFlightInfoRemindDialog()}
         onSubmit={() => {
           closeFlightInfoRemindDialog()
           openFlightInfoSuccessDialog()
         }}
-        onCancel={() => closeFlightInfoRemindDialog}
+        onCancel={closeFlightInfoRemindDialog}
       />
 
       <Backdrop
