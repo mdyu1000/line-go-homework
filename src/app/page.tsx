@@ -94,6 +94,7 @@ export default function Home() {
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
+    if (event.target instanceof HTMLTextAreaElement) return
     if (event.key === 'Enter') event.preventDefault();
   };
 
